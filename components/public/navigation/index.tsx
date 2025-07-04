@@ -7,7 +7,6 @@ import { useMount, useUnmount } from "react-use";
 import classNames from "classnames";
 
 import { Button } from "@/components/ui/button";
-import Logo from "@/assets/logo.svg";
 import { useUser } from "@/hooks/useUser";
 import { UserMenu } from "@/components/user-menu";
 
@@ -86,15 +85,19 @@ export default function Navigation() {
       )}
     >
       <nav className="grid grid-cols-2 p-4 container mx-auto">
-        <Link href="/" className="flex items-center gap-1">
-          <Image
-            src={Logo}
-            className="w-9 mr-1"
-            alt="DeepSite Logo"
-            width={64}
-            height={64}
-          />
-          <p className="font-sans text-white text-xl font-bold">DeepSite</p>
+        <Link href="/" className="flex flex-col items-start gap-1" aria-label="Dot Studio AI Home" title="Dot Studio AI">
+          <div className="flex items-center gap-1">
+            <Image
+              src="/logo.png"
+              className="w-9 mr-1"
+              alt="Dot Studio AI Logo"
+              width={48}
+              height={48}
+              unoptimized={true}
+            />
+            <p className="font-sans text-white text-xl font-bold">Dot Studio AI</p>
+          </div>
+          <span className="text-xs text-neutral-400 ml-1">by Kunal</span>
         </Link>
         <ul className="items-center justify-center gap-6 hidden">
           {navigationLinks.map((link) => (

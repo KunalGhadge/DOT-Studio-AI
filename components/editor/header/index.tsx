@@ -1,11 +1,10 @@
 import { ReactNode } from "react";
 import { Eye, MessageCircleCode } from "lucide-react";
 
-import Logo from "@/assets/logo.svg";
-
 import { Button } from "@/components/ui/button";
 import classNames from "classnames";
 import Image from "next/image";
+import { TokenManager } from "@/components/editor/token-manager";
 
 const TABS = [
   {
@@ -34,17 +33,22 @@ export function Header({
       <div className="flex items-center justify-start gap-3">
         <h1 className="text-neutral-900 dark:text-white text-lg lg:text-xl font-bold flex items-center justify-start">
           <Image
-            src={Logo}
-            alt="DeepSite Logo"
+            src="/logo.png"
+            alt="Dot Studio AI Logo"
             className="size-6 lg:size-8 mr-2 invert-100 dark:invert-0"
+            width={48}
+            height={48}
+            unoptimized={true}
           />
-          <p className="max-md:hidden flex items-center justify-start">
-            DeepSite
-            <span className="font-mono bg-gradient-to-br from-sky-500 to-emerald-500 text-neutral-950 rounded-full text-xs ml-2 px-1.5 py-0.5">
-              {" "}
-              v2
-            </span>
-          </p>
+          <div className="flex flex-col">
+            <p className="max-md:hidden flex items-center justify-start">
+              Dot Studio AI Editor
+              <span className="font-mono bg-gradient-to-br from-sky-500 to-emerald-500 text-neutral-950 rounded-full text-xs ml-2 px-1.5 py-0.5">
+                {" "}v2
+              </span>
+            </p>
+            <span className="text-xs text-neutral-500 font-normal ml-1">by Kunal</span>
+          </div>
         </h1>
       </div>
       <div className="flex items-center justify-start lg:justify-center gap-1 max-lg:pl-3 flex-1 max-lg:border-l max-lg:border-l-neutral-800">
@@ -63,7 +67,10 @@ export function Header({
           </Button>
         ))}
       </div>
-      <div className="flex items-center justify-end gap-3">{children}</div>
+      <div className="flex items-center justify-end gap-3">
+        <TokenManager />
+        {children}
+      </div>
     </header>
   );
 }

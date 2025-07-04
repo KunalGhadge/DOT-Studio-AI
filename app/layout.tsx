@@ -23,40 +23,49 @@ const ptSans = PT_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "DeepSite | Build with AI ✨",
+  title: "Dot Studio AI",
   description:
-    "DeepSite is a web development tool that helps you build websites with AI, no code required. Let's deploy your website with DeepSite and enjoy the magic of AI.",
+    "Collaborative AI-powered HTML Editor to reimagine and redesign your websites visually.",
+  keywords: [
+    "dotstudio",
+    "dot studio ai",
+    "html editor",
+    "AI redesign",
+    "collaborative web editor"
+  ],
+  authors: [
+    { name: "Kunal", url: "https://dotstudio.dev" }
+  ],
   openGraph: {
-    title: "DeepSite | Build with AI ✨",
+    title: "Dot Studio AI",
     description:
-      "DeepSite is a web development tool that helps you build websites with AI, no code required. Let's deploy your website with DeepSite and enjoy the magic of AI.",
-    url: "https://deepsite.hf.co",
-    siteName: "DeepSite",
+      "Collaborative AI-powered HTML Editor to reimagine and redesign your websites visually.",
+    siteName: "Dot Studio AI",
     images: [
       {
-        url: "https://deepsite.hf.co/banner.png",
+        url: "/banner.png",
         width: 1200,
         height: 630,
-        alt: "DeepSite Open Graph Image",
+        alt: "Dot Studio AI Open Graph Image",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "DeepSite | Build with AI ✨",
+    title: "Dot Studio AI",
     description:
-      "DeepSite is a web development tool that helps you build websites with AI, no code required. Let's deploy your website with DeepSite and enjoy the magic of AI.",
-    images: ["https://deepsite.hf.co/banner.png"],
+      "Collaborative AI-powered HTML Editor to reimagine and redesign your websites visually.",
+    images: ["/banner.png"],
   },
   appleWebApp: {
     capable: true,
-    title: "DeepSite",
+    title: "Dot Studio AI",
     statusBarStyle: "black-translucent",
   },
   icons: {
-    icon: "/logo.svg",
-    shortcut: "/logo.svg",
-    apple: "/logo.svg",
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
   },
 };
 
@@ -92,7 +101,7 @@ export default async function RootLayout({
     <html lang="en">
       <Script
         defer
-        data-domain="deepsite.hf.co"
+        data-domain="dotstudioai.hf.co"
         src="https://plausible.io/js/script.js"
       ></Script>
       <body

@@ -1,28 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
-import { headers } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
+// import { headers } from "next/headers"; // Removed unused import
 import { InferenceClient } from "@huggingface/inference";
-
-import { MODELS, PROVIDERS } from "@/lib/providers";
+// import MY_TOKEN_KEY from "@/lib/get-cookie-name"; // Removed unused import
 import {
-  DIVIDER,
-  FOLLOW_UP_SYSTEM_PROMPT,
   INITIAL_SYSTEM_PROMPT,
-  MAX_REQUESTS_PER_IP,
-  REPLACE_END,
+  FOLLOW_UP_SYSTEM_PROMPT,
   SEARCH_START,
+  DIVIDER,
+  REPLACE_END,
 } from "@/lib/prompts";
-import MY_TOKEN_KEY from "@/lib/get-cookie-name";
-
-const ipAddresses = new Map();
+import { MODELS, PROVIDERS } from "@/lib/providers";
 
 export async function POST(request: NextRequest) {
-  const authHeaders = await headers();
-  const userToken = request.cookies.get(MY_TOKEN_KEY())?.value;
+  // const authHeaders = await headers(); // Removed unused variable
+  // const userToken = request.cookies.get(MY_TOKEN_KEY())?.value; // Removed unused variable
 
   const body = await request.json();
-  const { prompt, provider, model, redesignMarkdown, html } = body;
+  const { prompt, provider, model, redesignMarkdown, html, userHfToken } = body;
 
   if (!model || (!prompt && !redesignMarkdown)) {
     return NextResponse.json(
@@ -52,37 +47,29 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let token = userToken;
-  let billTo: string | null = null;
+  const token = userHfToken; // Use user's token from client-side storage
+  const billTo: string | null = null;
 
-  /**
-   * Handle local usage token, this bypass the need for a user token
-   * and allows local testing without authentication.
-   * This is useful for development and testing purposes.
-   */
-  if (process.env.HF_TOKEN && process.env.HF_TOKEN.length > 0) {
-    token = process.env.HF_TOKEN;
+  // If no user token provided, show error
+  if (!token || token.trim().length === 0) {
+    return NextResponse.json(
+      {
+        ok: false,
+        message: "Please enter your Hugging Face token in the HF Token button to use AI features.",
+      },
+      { status: 400 }
+    );
   }
 
-  const ip = authHeaders.get("x-forwarded-for")?.includes(",")
-    ? authHeaders.get("x-forwarded-for")?.split(",")[1].trim()
-    : authHeaders.get("x-forwarded-for");
-
-  if (!token) {
-    ipAddresses.set(ip, (ipAddresses.get(ip) || 0) + 1);
-    if (ipAddresses.get(ip) > MAX_REQUESTS_PER_IP) {
-      return NextResponse.json(
-        {
-          ok: false,
-          openLogin: true,
-          message: "Log In to continue using the service",
-        },
-        { status: 429 }
-      );
-    }
-
-    token = process.env.DEFAULT_HF_TOKEN as string;
-    billTo = "huggingface";
+  // Validate token format
+  if (!token.startsWith("hf_")) {
+    return NextResponse.json(
+      {
+        ok: false,
+        message: "Invalid Hugging Face token format. Token should start with 'hf_'.",
+      },
+      { status: 400 }
+    );
   }
 
   const DEFAULT_PROVIDER = PROVIDERS.novita;
@@ -219,11 +206,11 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
-  const authHeaders = await headers();
-  const userToken = request.cookies.get(MY_TOKEN_KEY())?.value;
+  // const authHeaders = await headers(); // Removed unused variable
+  // const userToken = request.cookies.get(MY_TOKEN_KEY())?.value; // Removed unused variable
 
   const body = await request.json();
-  const { prompt, html, previousPrompt, provider, selectedElementHtml } = body;
+  const { prompt, html, previousPrompt, provider, selectedElementHtml, userHfToken } = body;
 
   if (!prompt || !html) {
     return NextResponse.json(
@@ -234,37 +221,29 @@ export async function PUT(request: NextRequest) {
 
   const selectedModel = MODELS[0];
 
-  let token = userToken;
-  let billTo: string | null = null;
+  const token = userHfToken; // Use user's token from client-side storage
+  const billTo: string | null = null;
 
-  /**
-   * Handle local usage token, this bypass the need for a user token
-   * and allows local testing without authentication.
-   * This is useful for development and testing purposes.
-   */
-  if (process.env.HF_TOKEN && process.env.HF_TOKEN.length > 0) {
-    token = process.env.HF_TOKEN;
+  // If no user token provided, show error
+  if (!token || token.trim().length === 0) {
+    return NextResponse.json(
+      {
+        ok: false,
+        message: "Please enter your Hugging Face token in the HF Token button to use AI features.",
+      },
+      { status: 400 }
+    );
   }
 
-  const ip = authHeaders.get("x-forwarded-for")?.includes(",")
-    ? authHeaders.get("x-forwarded-for")?.split(",")[1].trim()
-    : authHeaders.get("x-forwarded-for");
-
-  if (!token) {
-    ipAddresses.set(ip, (ipAddresses.get(ip) || 0) + 1);
-    if (ipAddresses.get(ip) > MAX_REQUESTS_PER_IP) {
-      return NextResponse.json(
-        {
-          ok: false,
-          openLogin: true,
-          message: "Log In to continue using the service",
-        },
-        { status: 429 }
-      );
-    }
-
-    token = process.env.DEFAULT_HF_TOKEN as string;
-    billTo = "huggingface";
+  // Validate token format
+  if (!token.startsWith("hf_")) {
+    return NextResponse.json(
+      {
+        ok: false,
+        message: "Invalid Hugging Face token format. Token should start with 'hf_'.",
+      },
+      { status: 400 }
+    );
   }
 
   const client = new InferenceClient(token);

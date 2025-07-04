@@ -1,6 +1,6 @@
 "use client";
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import classNames from "classnames";
 import { toast } from "sonner";
 import { useLocalStorage, useUpdateEffect } from "react-use";
@@ -13,7 +13,6 @@ import { MODELS } from "@/lib/providers";
 import { HtmlHistory } from "@/types";
 import { InviteFriends } from "@/components/invite-friends";
 import { Settings } from "@/components/editor/ask-ai/settings";
-import { LoginModal } from "@/components/login-modal";
 import { ReImagine } from "@/components/editor/ask-ai/re-imagine";
 import Loading from "@/components/loading";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -52,7 +51,6 @@ export function AskAI({
   const refThink = useRef<HTMLDivElement | null>(null);
   const audio = useRef<HTMLAudioElement | null>(null);
 
-  const [open, setOpen] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [hasAsked, setHasAsked] = useState(false);
   const [previousPrompt, setPreviousPrompt] = useState("");
@@ -66,10 +64,37 @@ export function AskAI({
   const [isThinking, setIsThinking] = useState(true);
   const [controller, setController] = useState<AbortController | null>(null);
   const [isFollowUp, setIsFollowUp] = useState(true);
+  const [userHfToken] = useLocalStorage("hf_token", "");
+  const [isClient, setIsClient] = useState(false);
+
+  // Add a check to ensure token is loaded
+  const isTokenAvailable = userHfToken && userHfToken.trim().length > 0;
+
+  // Prevent hydration mismatch by only showing token status after client-side render
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Add useEffect to show token status on mount
+  useEffect(() => {
+    if (!isTokenAvailable) {
+      // Don't show error on mount, just log for debugging
+      console.log("No HF token found - user needs to add one");
+    } else {
+      console.log("HF token is available and ready");
+    }
+  }, [isTokenAvailable]);
 
   const callAi = async (redesignMarkdown?: string) => {
     if (isAiWorking) return;
     if (!redesignMarkdown && !prompt.trim()) return;
+    
+    // Check if user has provided a token with better error message
+    if (!isTokenAvailable) {
+      toast.error("Please enter your Hugging Face token in the HF Token button to use AI features");
+      return;
+    }
+    
     setisAiWorking(true);
     setProviderError("");
     setThink("");
@@ -97,6 +122,7 @@ export function AskAI({
             model,
             html,
             selectedElementHtml,
+            userHfToken: userHfToken.trim(), // Ensure clean token
           }),
           headers: {
             "Content-Type": "application/json",
@@ -107,9 +133,7 @@ export function AskAI({
         if (request && request.body) {
           const res = await request.json();
           if (!request.ok) {
-            if (res.openLogin) {
-              setOpen(true);
-            } else if (res.openSelectProvider) {
+            if (res.openSelectProvider) {
               setOpenProvider(true);
               setProviderError(res.message);
             } else if (res.openProModal) {
@@ -137,6 +161,7 @@ export function AskAI({
             model,
             html: isSameHtml ? "" : html,
             redesignMarkdown,
+            userHfToken: userHfToken.trim(), // Ensure clean token
           }),
           headers: {
             "Content-Type": "application/json",
@@ -159,9 +184,7 @@ export function AskAI({
                 contentResponse.trim().endsWith("}");
               const jsonResponse = isJson ? JSON.parse(contentResponse) : null;
               if (jsonResponse && !jsonResponse.ok) {
-                if (jsonResponse.openLogin) {
-                  setOpen(true);
-                } else if (jsonResponse.openSelectProvider) {
+                if (jsonResponse.openSelectProvider) {
                   setOpenProvider(true);
                   setProviderError(jsonResponse.message);
                 } else if (jsonResponse.openProModal) {
@@ -251,9 +274,6 @@ export function AskAI({
     } catch (error: any) {
       setisAiWorking(false);
       toast.error(error.message);
-      if (error.openLogin) {
-        setOpen(true);
-      }
     }
   };
 
@@ -365,7 +385,7 @@ export function AskAI({
                 ? `Ask DeepSite about ${selectedElement.tagName.toLowerCase()}...`
                 : hasAsked
                 ? "Ask DeepSite for edits"
-                : "Ask DeepSite anything..."
+                : "Ask Dot Studio AI anything..."
             }
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
@@ -407,6 +427,24 @@ export function AskAI({
               </Tooltip>
             )}
             <InviteFriends />
+            {!isClient && (
+              <div className="flex items-center gap-1 text-xs text-amber-400 bg-amber-400/10 px-2 py-1 rounded border border-amber-400/20">
+                <span>⚠</span>
+                <span>Add HF Token</span>
+              </div>
+            )}
+            {isClient && !isTokenAvailable && (
+              <div className="flex items-center gap-1 text-xs text-amber-400 bg-amber-400/10 px-2 py-1 rounded border border-amber-400/20">
+                <span>⚠</span>
+                <span>Add HF Token</span>
+              </div>
+            )}
+            {isClient && isTokenAvailable && (
+              <div className="flex items-center gap-1 text-xs text-green-400 bg-green-400/10 px-2 py-1 rounded border border-green-400/20">
+                <span>✓</span>
+                <span>Token Ready</span>
+              </div>
+            )}
           </div>
           <div className="flex items-center justify-end gap-2">
             <Settings
@@ -428,7 +466,6 @@ export function AskAI({
             </Button>
           </div>
         </div>
-        <LoginModal open={open} onClose={() => setOpen(false)} html={html} />
         <ProModal
           html={html}
           open={openProModal}

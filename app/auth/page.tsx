@@ -18,9 +18,11 @@ export default async function Auth() {
   return (
     <div className="p-4">
       <div className="border bg-red-500/10 border-red-500/20 text-red-500 px-5 py-3 rounded-lg">
-        <h1 className="text-xl font-bold">Error</h1>
+        <h1 className="text-2xl font-bold text-primary">Dot Studio AI</h1>
+        <p className="text-xs text-neutral-500 mb-2">by Kunal</p>
+        <h2 className="text-xl font-bold">Error</h2>
         <p className="text-sm">
-          An error occurred while trying to log in. Please try again later.
+          An error occurred while trying to log in to Dot Studio AI. Please try again later.
         </p>
       </div>
     </div>

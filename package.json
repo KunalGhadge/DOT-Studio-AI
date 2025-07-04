@@ -1,7 +1,8 @@
 {
-  "name": "deepsite-v2",
+  "name": "dotstudioai",
   "version": "0.1.0",
   "private": true,
+  "description": "Dot Studio AI - Modern AI-powered Web Editor and Generator",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
@@ -60,5 +61,8 @@
     "tw-animate-css": "^1.3.4",
     "typescript": "^5",
     "url-loader": "^4.1.1"
-  }
+  },
+  "author": "Kunal",
+  "company": "Dot Studio AI",
+  "keywords": ["dotstudioai", "ai", "web", "editor"]
 }

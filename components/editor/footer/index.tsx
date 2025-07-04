@@ -49,79 +49,86 @@ export function Footer({
   };
 
   return (
-    <footer className="border-t bg-slate-200 border-slate-300 dark:bg-neutral-950 dark:border-neutral-800 px-3 py-2 flex items-center justify-between sticky bottom-0 z-20">
-      <div className="flex items-center gap-2">
-        {user &&
-          (user?.isLocalUse ? (
+    <>
+      <footer className="border-t bg-slate-200 border-slate-300 dark:bg-neutral-950 dark:border-neutral-800 px-3 py-2 flex items-center justify-between sticky bottom-0 z-20">
+        <div className="flex items-center gap-2">
+          <span className="text-base font-bold text-primary">Dot Studio AI</span>
+          <span className="text-xs text-neutral-500 ml-1">by Kunal</span>
+          {user &&
+            (user?.isLocalUse ? (
+              <>
+                <div className="max-w-max bg-amber-500/10 rounded-full px-3 py-1 text-amber-500 border border-amber-500/20 text-sm font-semibold">
+                  Local Usage
+                </div>
+              </>
+            ) : (
+              <UserMenu className="!p-1 !pr-3 !h-auto" />
+            ))}
+          {user && <p className="text-neutral-700">|</p>}
+          <Button size="sm" variant="secondary" onClick={onReset}>
+            <MdAdd className="text-sm" />
+            New <span className="max-lg:hidden">Project</span>
+          </Button>
+          {htmlHistory && htmlHistory.length > 0 && (
             <>
-              <div className="max-w-max bg-amber-500/10 rounded-full px-3 py-1 text-amber-500 border border-amber-500/20 text-sm font-semibold">
-                Local Usage
-              </div>
+              <p className="text-neutral-700">|</p>
+              <History history={htmlHistory} setHtml={setHtml} />
             </>
-          ) : (
-            <UserMenu className="!p-1 !pr-3 !h-auto" />
-          ))}
-        {user && <p className="text-neutral-700">|</p>}
-        <Button size="sm" variant="secondary" onClick={onReset}>
-          <MdAdd className="text-sm" />
-          New <span className="max-lg:hidden">Project</span>
-        </Button>
-        {htmlHistory && htmlHistory.length > 0 && (
-          <>
-            <p className="text-neutral-700">|</p>
-            <History history={htmlHistory} setHtml={setHtml} />
-          </>
-        )}
-      </div>
-      <div className="flex justify-end items-center gap-2.5">
-        <a
-          href="https://huggingface.co/spaces/victor/deepsite-gallery"
-          target="_blank"
-        >
-          <Button size="sm" variant="ghost">
-            <SparkleIcon className="size-3.5" />
-            <span className="max-lg:hidden">DeepSite Gallery</span>
+          )}
+        </div>
+        <div className="flex justify-end items-center gap-2.5">
+          <a
+            href="https://huggingface.co/spaces/victor/dotstudioai-gallery"
+            target="_blank"
+          >
+            <Button size="sm" variant="ghost">
+              <SparkleIcon className="size-3.5" />
+              <span className="max-lg:hidden">Dot Studio AI Gallery</span>
+            </Button>
+          </a>
+          <a
+            target="_blank"
+            href="https://huggingface.co/spaces/enzostvs/dotstudioai/discussions/157"
+          >
+            <Button size="sm" variant="outline">
+              <HelpCircle className="size-3.5" />
+              <span className="max-lg:hidden">Help</span>
+            </Button>
+          </a>
+          <Button size="sm" variant="outline" onClick={handleRefreshIframe}>
+            <RefreshCcw className="size-3.5" />
+            <span className="max-lg:hidden">Refresh Preview</span>
           </Button>
-        </a>
-        <a
-          target="_blank"
-          href="https://huggingface.co/spaces/enzostvs/deepsite/discussions/157"
-        >
-          <Button size="sm" variant="outline">
-            <HelpCircle className="size-3.5" />
-            <span className="max-lg:hidden">Help</span>
-          </Button>
-        </a>
-        <Button size="sm" variant="outline" onClick={handleRefreshIframe}>
-          <RefreshCcw className="size-3.5" />
-          <span className="max-lg:hidden">Refresh Preview</span>
-        </Button>
-        <div className="flex items-center rounded-full p-0.5 bg-neutral-700/70 relative overflow-hidden z-0 max-lg:hidden gap-0.5">
-          <div
-            className={classNames(
-              "absolute left-0.5 top-0.5 rounded-full bg-white size-7 -z-[1] transition-all duration-200",
-              {
-                "translate-x-[calc(100%+2px)]": device === "mobile",
-              }
-            )}
-          />
-          {DEVICES.map((deviceItem) => (
-            <button
-              key={deviceItem.name}
+          <div className="flex items-center rounded-full p-0.5 bg-neutral-700/70 relative overflow-hidden z-0 max-lg:hidden gap-0.5">
+            <div
               className={classNames(
-                "rounded-full text-neutral-300 size-7 flex items-center justify-center cursor-pointer",
+                "absolute left-0.5 top-0.5 rounded-full bg-white size-7 -z-[1] transition-all duration-200",
                 {
-                  "!text-black": device === deviceItem.name,
-                  "hover:bg-neutral-800": device !== deviceItem.name,
+                  "translate-x-[calc(100%+2px)]": device === "mobile",
                 }
               )}
-              onClick={() => setDevice(deviceItem.name as "desktop" | "mobile")}
-            >
-              <deviceItem.icon className="text-sm" />
-            </button>
-          ))}
+            />
+            {DEVICES.map((deviceItem) => (
+              <button
+                key={deviceItem.name}
+                className={classNames(
+                  "rounded-full text-neutral-300 size-7 flex items-center justify-center cursor-pointer",
+                  {
+                    "!text-black": device === deviceItem.name,
+                    "hover:bg-neutral-800": device !== deviceItem.name,
+                  }
+                )}
+                onClick={() => setDevice(deviceItem.name as "desktop" | "mobile")}
+              >
+                <deviceItem.icon className="text-sm" />
+              </button>
+            ))}
+          </div>
         </div>
+      </footer>
+      <div className="w-full text-center py-2 text-xs text-neutral-500 bg-transparent">
+        © 2025 DOT Studio AI · Crafted with ❤️ by Kunal
       </div>
-    </footer>
+    </>
   );
 }
