@@ -164,6 +164,9 @@ export async function POST(request: NextRequest) {
           }
         }
       } catch (error: any) {
+        console.error("AI Provider Error:", error);
+        
+        // Check for specific error types
         if (error.message?.includes("exceeded your monthly included credits")) {
           await writer.write(
             encoder.encode(
@@ -174,6 +177,25 @@ export async function POST(request: NextRequest) {
               })
             )
           );
+        } else if (error.message?.includes("HTTP error") || error.message?.includes("Failed to perform inference")) {
+          await writer.write(
+            encoder.encode(
+              JSON.stringify({
+                ok: false,
+                openSelectProvider: true,
+                message: "The AI provider is currently experiencing issues. Please try switching to a different provider in Settings, or try again in a few minutes.",
+              })
+            )
+          );
+        } else if (error.message?.includes("rate limit") || error.message?.includes("too many requests")) {
+          await writer.write(
+            encoder.encode(
+              JSON.stringify({
+                ok: false,
+                message: "Rate limit exceeded. Please wait a moment and try again, or switch to a different AI provider.",
+              })
+            )
+          );
         } else {
           await writer.write(
             encoder.encode(
@@ -181,7 +203,7 @@ export async function POST(request: NextRequest) {
                 ok: false,
                 message:
                   error.message ||
-                  "An error occurred while processing your request.",
+                  "An error occurred while processing your request. Please try again or switch AI providers.",
               })
             )
           );
@@ -366,6 +388,8 @@ export async function PUT(request: NextRequest) {
       );
     }
   } catch (error: any) {
+    console.error("AI Provider Error (Follow-up):", error);
+    
     if (error.message?.includes("exceeded your monthly included credits")) {
       return NextResponse.json(
         {
@@ -375,13 +399,30 @@ export async function PUT(request: NextRequest) {
         },
         { status: 402 }
       );
+    } else if (error.message?.includes("HTTP error") || error.message?.includes("Failed to perform inference")) {
+      return NextResponse.json(
+        {
+          ok: false,
+          openSelectProvider: true,
+          message: "The AI provider is currently experiencing issues. Please try switching to a different provider in Settings, or try again in a few minutes.",
+        },
+        { status: 503 }
+      );
+    } else if (error.message?.includes("rate limit") || error.message?.includes("too many requests")) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message: "Rate limit exceeded. Please wait a moment and try again, or switch to a different AI provider.",
+        },
+        { status: 429 }
+      );
     }
     return NextResponse.json(
       {
         ok: false,
         openSelectProvider: true,
         message:
-          error.message || "An error occurred while processing your request.",
+          error.message || "An error occurred while processing your request. Please try again or switch AI providers.",
       },
       { status: 500 }
     );
