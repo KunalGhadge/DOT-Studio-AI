@@ -187,6 +187,15 @@ export async function POST(request: NextRequest) {
               })
             )
           );
+        } else if (error.message?.includes("Invalid credentials") || error.message?.includes("Authorization header")) {
+          await writer.write(
+            encoder.encode(
+              JSON.stringify({
+                ok: false,
+                message: "Invalid Hugging Face token. Please check your token in the HF Token button and make sure it's valid and has the right permissions.",
+              })
+            )
+          );
         } else if (error.message?.includes("rate limit") || error.message?.includes("too many requests")) {
           await writer.write(
             encoder.encode(
@@ -407,6 +416,14 @@ export async function PUT(request: NextRequest) {
           message: "The AI provider is currently experiencing issues. Please try switching to a different provider in Settings, or try again in a few minutes.",
         },
         { status: 503 }
+      );
+    } else if (error.message?.includes("Invalid credentials") || error.message?.includes("Authorization header")) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message: "Invalid Hugging Face token. Please check your token in the HF Token button and make sure it's valid and has the right permissions.",
+        },
+        { status: 401 }
       );
     } else if (error.message?.includes("rate limit") || error.message?.includes("too many requests")) {
       return NextResponse.json(
